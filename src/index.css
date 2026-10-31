@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* Babbi's brand palette */
+@theme {
+  --font-display: "Rozha One", "Noto Sans Kannada", serif;
+  --font-sans: "Jost", "Noto Sans Kannada", system-ui, sans-serif;
+  --color-merino: #f5eedd;      /* page background */
+  --color-card: #fbf8ee;        /* slightly lighter cream for cards */
+  --color-rock: #84b3ce;        /* Rock Blue, accents and fills */
+  --color-rock-light: #c3dae8;  /* tint of Rock Blue for text on dark blue */
+  --color-venice: #16587b;      /* Venice Blue, main brand colour */
+  --color-ink: #12303f;         /* body text */
+  --color-alert: #b5412d;       /* only for errors and low stock */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-merino);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis: none; /* the display font has one weight; do not fake bold */
+  -webkit-font-smoothing: antialiased;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ---------- Cat animations ---------- */
+@keyframes cat-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes head-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes cat-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+@keyframes paw-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-16deg); }
+}
+@keyframes fish-wiggle {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+@keyframes cat-pop {
+  0% { transform: translateY(105%); }
+  60% { transform: translateY(-8%); }
+  100% { transform: translateY(0); }
+}
+
+.cat-bob { animation: cat-bob 3.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.head-bob { animation: head-bob 3s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.cat-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cat-blink 4.5s infinite;
+  animation-delay: var(--d, 0s);
+}
+.paw-wave {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: paw-wave 2.4s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fish-wiggle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fish-wiggle 2.6s ease-in-out infinite;
+}
+.cat-pop { animation: cat-pop 0.5s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
