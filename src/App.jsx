@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLang } from './i18n.jsx'
 import { useCart } from './cart.jsx'
-import { PRODUCTS, CATEGORIES } from './data/products.js'
+import { useProducts } from './products.jsx'
+import { CATEGORIES } from './data/products.js'
+import Admin from './components/Admin.jsx'
 import { SHOP } from './config.js'
 import ProductCard from './components/ProductCard.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import Checkout from './components/Checkout.jsx'
 import Cat from './components/Cat.jsx'
+import ProductModal from './components/ProductModal.jsx'
 
 function Sun({ className = '' }) {
   return (
@@ -30,15 +33,25 @@ function Sun({ className = '' }) {
 export default function App() {
   const { lang, setLang, t } = useLang()
   const { count, setOpen } = useCart()
+  const { products, loading, error, reload } = useProducts()
+  const [route, setRoute] = useState(window.location.hash)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('default')
   const [inStock, setInStock] = useState(false)
   const [checkingOut, setCheckingOut] = useState(false)
+  const [selected, setSelected] = useState(null)
+
+  // The admin page lives at  yoursite.com/#/admin
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    let list = PRODUCTS.filter((p) => {
+    let list = products.filter((p) => {
       if (category !== 'all' && p.category !== category) return false
       if (inStock && p.stockKg <= 0) return false
       if (!q) return true
@@ -48,7 +61,9 @@ export default function App() {
     if (sort === 'low') list = [...list].sort((a, b) => a.pricePerKg - b.pricePerKg)
     if (sort === 'high') list = [...list].sort((a, b) => b.pricePerKg - a.pricePerKg)
     return list
-  }, [query, category, sort, inStock])
+  }, [products, query, category, sort, inStock])
+
+  if (route.startsWith('#/admin')) return <Admin />
 
   const waLink = `https://wa.me/${SHOP.whatsapp}`
 
@@ -173,7 +188,19 @@ export default function App() {
           ))}
         </div>
 
-        {visible.length === 0 ? (
+        {loading ? (
+          <p className="py-16 text-center text-venice/70">{t('loading')}</p>
+        ) : error && products.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-12 text-center">
+            <p className="max-w-sm text-venice/70">{t('loadError')}</p>
+            <button
+              onClick={reload}
+              className="rounded-xl bg-venice px-5 py-2.5 text-sm font-semibold text-merino hover:brightness-110"
+            >
+              {t('retry')}
+            </button>
+          </div>
+        ) : visible.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
             <Cat variant="hero" className="w-36" />
             <p className="text-venice/70">{t('noResults')}</p>
@@ -181,7 +208,7 @@ export default function App() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id} product={p} onOpen={setSelected} />
             ))}
           </div>
         )}
@@ -242,6 +269,7 @@ export default function App() {
           setCheckingOut(true)
         }}
       />
+      {selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}
       {checkingOut && <Checkout onClose={() => setCheckingOut(false)} />}
     </div>
   )

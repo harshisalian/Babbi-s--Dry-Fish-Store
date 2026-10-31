@@ -36,3 +36,16 @@ npm run build    # production build in dist/
 ## Deploy
 
 Push to GitHub and import the repo in Vercel (framework: Vite). No environment variables needed yet.
+
+## Product photos
+
+Put compressed photos (under 200 KB each) in `public/images/` and set `image: '/images/prawns.jpg'` on the product in `src/data/products.js`. Products without a photo show the emoji placeholder.
+
+## Admin page and database (added)
+
+- Open `/#/admin` to sign in and change prices, stock, photos and descriptions, hide a fish, or add a new one.
+- Setup steps (about 20 minutes): see `SUPABASE_SETUP.md`. Until then the shop shows the sample fish from `src/data/products.js`.
+- New files: `src/products.jsx` (loads the fish), `src/lib/supabase.js`, `src/components/Admin.jsx`, `supabase/schema.sql`, `supabase/seed.sql`, `.env.example`.
+- After pulling this update run `npm install` once.
+
+Remaining ideas, in order: save orders in the database, upload photos from the admin page, Razorpay payments, order tracking, AI helpers.
